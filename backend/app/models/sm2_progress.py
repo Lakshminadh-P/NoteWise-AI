@@ -2,10 +2,10 @@ import uuid
 from datetime import date, datetime, timezone
 
 from sqlalchemy import Float, Integer, Date, DateTime, ForeignKey, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.core.guid import GUID
 
 
 class UserCardProgress(Base):
@@ -14,9 +14,9 @@ class UserCardProgress(Base):
         UniqueConstraint("user_id", "flashcard_id", name="uq_user_flashcard"),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
-    flashcard_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("flashcards.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey("users.id"), nullable=False, index=True)
+    flashcard_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey("flashcards.id"), nullable=False, index=True)
 
     # SM-2 state
     repetition_number: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

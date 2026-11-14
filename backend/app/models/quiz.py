@@ -2,17 +2,17 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import String, Text, Integer, Float, DateTime, ForeignKey, JSON
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.core.guid import GUID
 
 
 class Quiz(Base):
     __tablename__ = "quizzes"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    document_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("documents.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    document_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey("documents.id"), nullable=False, index=True)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     quiz_type: Mapped[str] = mapped_column(String(20), nullable=False, default="mixed")  # mcq | free_text | mixed
     question_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
@@ -27,8 +27,8 @@ class Quiz(Base):
 class QuizQuestion(Base):
     __tablename__ = "quiz_questions"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    quiz_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("quizzes.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    quiz_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey("quizzes.id"), nullable=False, index=True)
     question_text: Mapped[str] = mapped_column(Text, nullable=False)
     reference_answer: Mapped[str] = mapped_column(Text, nullable=False)
     options: Mapped[dict | None] = mapped_column(JSON, nullable=True)  # {"A": "...", "B": "...", ...} for MCQ
@@ -44,9 +44,9 @@ class QuizQuestion(Base):
 class QuizSession(Base):
     __tablename__ = "quiz_sessions"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
-    quiz_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("quizzes.id"), nullable=False, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey("users.id"), nullable=False, index=True)
+    quiz_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey("quizzes.id"), nullable=False, index=True)
     total_score: Mapped[float | None] = mapped_column(Float, nullable=True)
     total_questions: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
@@ -61,9 +61,9 @@ class QuizSession(Base):
 class QuizAttempt(Base):
     __tablename__ = "quiz_attempts"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    session_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("quiz_sessions.id"), nullable=False, index=True)
-    question_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("quiz_questions.id"), nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(GUID, primary_key=True, default=uuid.uuid4)
+    session_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey("quiz_sessions.id"), nullable=False, index=True)
+    question_id: Mapped[uuid.UUID] = mapped_column(GUID, ForeignKey("quiz_questions.id"), nullable=False)
     user_answer: Mapped[str] = mapped_column(Text, nullable=False)
     score: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)  # 0.0 - 5.0
     ai_feedback: Mapped[str | None] = mapped_column(Text, nullable=True)
